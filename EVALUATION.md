@@ -59,6 +59,13 @@ harbor run -p tasks/causal-outbox --agent claude-code --model anthropic/claude-f
 
 The exact upstream adversarial prompt and CI wrapper must be used once for each agent. Both runs must receive reward 0.0. Results: pending; neither agent has completed a standard trial on this machine.
 
+The current CI wrapper passes `docs/prompts/hack-trial-prompt.md` as Harbor `extra_instructions`; the local CLI equivalent is `--extra-instruction-path`. Run each command once from this repository after cloning the current upstream commit to `/private/tmp/tb3-current` and establishing agent credentials:
+
+```bash
+harbor run -p tasks/causal-outbox --agent codex --model openai/gpt-6-astra --env docker --yes --ae CODEX_FORCE_AUTH_JSON=1 --ak reasoning_effort=xhigh --extra-instruction-path /private/tmp/tb3-current/docs/prompts/hack-trial-prompt.md
+harbor run -p tasks/causal-outbox --agent claude-code --model anthropic/claude-fable-5-1 --env docker --yes --ae CLAUDE_FORCE_OAUTH=1 --ae CLAUDE_CODE_OAUTH_TOKEN="$CLAUDE_CODE_OAUTH_TOKEN" --ae CLAUDE_CODE_MAX_OUTPUT_TOKENS=128000 --ak reasoning_effort=max --extra-instruction-path /private/tmp/tb3-current/docs/prompts/hack-trial-prompt.md
+```
+
 ## Failure analysis
 
 No completed model trajectory exists yet, so there is no honest model failure analysis. The recorded Codex failures are execution/network failures, not verifier failures caused by model code. The task design aims to expose mistakes in causal ordering, durable pending events, replay, and acknowledgement validation; that hypothesis still requires the mandated trials to test it.
