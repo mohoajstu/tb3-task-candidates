@@ -1,0 +1,65 @@
+{
+    "reportFormat": "CTRF",
+    "specVersion": "0.0.0",
+    "timestamp": "2026-10-10T19:47:27.410972+00:00",
+    "generatedBy": "pytest",
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "9.1.1"
+        },
+        "summary": {
+            "tests": 4,
+            "passed": 4,
+            "failed": 0,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1791661643922,
+            "stop": 1791661647410
+        },
+        "environment": {
+            "buildName": "Pytest JSON CTRF Report",
+            "buildNumber": "000",
+            "buildUrl": "https://ctrf.io"
+        },
+        "tests": [
+            {
+                "name": "test_gateway.py::test_dependencies_order_and_retransmissions",
+                "status": "passed",
+                "duration": 932,
+                "start": 1791661644051,
+                "stop": 1791661644983,
+                "retries": 0,
+                "file_path": "test_gateway.py"
+            },
+            {
+                "name": "test_gateway.py::test_ambiguous_side_effect_and_rotating_credentials",
+                "status": "passed",
+                "duration": 1038,
+                "start": 1791661644984,
+                "stop": 1791661646022,
+                "retries": 0,
+                "file_path": "test_gateway.py"
+            },
+            {
+                "name": "test_gateway.py::test_pagination_resume_after_failure",
+                "status": "passed",
+                "duration": 755,
+                "start": 1791661646023,
+                "stop": 1791661646778,
+                "retries": 0,
+                "file_path": "test_gateway.py"
+            },
+            {
+                "name": "test_gateway.py::test_cycle_and_lexicographic_release",
+                "status": "passed",
+                "duration": 628,
+                "start": 1791661646781,
+                "stop": 1791661647409,
+                "retries": 0,
+                "file_path": "test_gateway.py"
+            }
+        ]
+    }
+}
