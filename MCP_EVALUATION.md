@@ -36,4 +36,4 @@ harbor run -p tasks/mcp-tool-recovery --agent codex --model openai/gpt-6-astra -
 harbor run -p tasks/mcp-tool-recovery --agent claude-code --model anthropic/claude-fable-5-1 --env docker --yes --ae CLAUDE_FORCE_OAUTH=1 --ae CLAUDE_CODE_OAUTH_TOKEN="$CLAUDE_CODE_OAUTH_TOKEN" --ae CLAUDE_CODE_MAX_OUTPUT_TOKENS=128000 --ak reasoning_effort=max --extra-instruction-path /private/tmp/tb3-current/docs/prompts/hack-trial-prompt.md
 ```
 
-Results: pending for both agents. No model-failure analysis is possible until completed trajectories exist.
+Results: both adversarial commands were attempted. Claude (jobs/2026-10-10__13-10-59) returned reward 0.0 with ApiRateLimitError because Fable 5.1 requires usage credits. Codex (jobs/2026-10-10__13-11-03) returned reward 0.0 with NonZeroAgentExitCodeError after workspace routing discovery failed. Neither agent reached the task, so neither result demonstrates verifier resistance to an adversarial model. Their Harbor summaries are in evidence/mcp-tool-recovery/claude-cheat-access-result.json and codex-cheat-infrastructure-result.json. No completed model trajectory exists for failure analysis.
