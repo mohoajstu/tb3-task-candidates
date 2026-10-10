@@ -1,11 +1,11 @@
-# Terminal-Bench 3 task candidates
+# Terminal-Bench 3 submission
 
-This repository contains two independent task candidates:
+The submitted task is **MCP tool recovery**. This repository also preserves **Causal outbox** as an additional independent task candidate; the hiring assignment asks for one task, so the MCP task is the one to evaluate for the submission.
 
 | Task | Agent objective | Evaluation |
 | --- | --- | --- |
+| **Submitted task:** [MCP tool recovery](tasks/mcp-tool-recovery/instruction.md) | Build a durable gateway for local JSON-RPC tool calls with token rotation, pagination, ambiguous retries, and dependencies. | [Results](MCP_EVALUATION.md) |
 | [Causal outbox](tasks/causal-outbox/instruction.md) | Build a durable event relay with causal ordering, topic replay, and acknowledgements. | [Results](EVALUATION.md) |
-| [MCP tool recovery](tasks/mcp-tool-recovery/instruction.md) | Build a durable gateway for local JSON-RPC tool calls with token rotation, pagination, ambiguous retries, and dependencies. | [Results](MCP_EVALUATION.md) |
 
 Each task has its own Docker environment, reference solution, and separate verifier. The MCP task includes a local demo service; neither task needs a live external API. Both are based on the [TB3 contribution guide](https://github.com/harbor-framework/terminal-bench-3/blob/main/CONTRIBUTING.md) and [review automation](https://github.com/harbor-framework/terminal-bench-3/blob/main/docs/TASK_REVIEW_AUTOMATION.md) at upstream commit 209679e34327a78ce8e9bf5300b2f317992863c9.
 
