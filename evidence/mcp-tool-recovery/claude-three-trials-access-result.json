@@ -1,0 +1,49 @@
+{
+    "id": "ab0fe08d-ad3a-429a-86c8-e78616221601",
+    "started_at": "2026-10-10T13:09:04.917718",
+    "updated_at": "2026-10-10T13:10:25.628733",
+    "finished_at": "2026-10-10T13:10:25.628733",
+    "n_total_trials": 3,
+    "stats": {
+        "n_completed_trials": 3,
+        "n_errored_trials": 3,
+        "n_running_trials": 0,
+        "n_pending_trials": 0,
+        "n_cancelled_trials": 0,
+        "n_retries": 0,
+        "evals": {
+            "claude-code__claude-fable-5-1__adhoc": {
+                "n_trials": 3,
+                "n_errors": 3,
+                "metrics": [
+                    {
+                        "mean": 0.0
+                    }
+                ],
+                "pass_at_k": {
+                    "2": 0.0
+                },
+                "reward_stats": {
+                    "reward": {
+                        "0.0": [
+                            "mcp-tool-recovery__gVTKmRZ",
+                            "mcp-tool-recovery__Z8fBBpt",
+                            "mcp-tool-recovery__zTdf6rQ"
+                        ]
+                    }
+                },
+                "exception_stats": {
+                    "ApiRateLimitError": [
+                        "mcp-tool-recovery__gVTKmRZ",
+                        "mcp-tool-recovery__Z8fBBpt",
+                        "mcp-tool-recovery__zTdf6rQ"
+                    ]
+                }
+            }
+        },
+        "n_input_tokens": 0,
+        "n_cache_tokens": 0,
+        "n_output_tokens": 0,
+        "cost_usd": 0.0
+    }
+}
