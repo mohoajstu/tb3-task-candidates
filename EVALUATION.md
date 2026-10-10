@@ -10,6 +10,8 @@
 
 ## Validation
 
+Reviewable local artifacts are in [`evidence/`](evidence/): the complete static-check output, Harbor result JSON for final oracle and nop runs, their per-test CTRF reports, and the errored Codex run summary. Harbor's full `jobs/` directories are local and omitted from Git because they may contain agent transcripts or credentials.
+
 | Check | Command | Result |
 | --- | --- | --- |
 | Static checks | `PATH="/private/tmp:$PATH"; for check in /private/tmp/tb3-current/scripts/checks/check-*.sh; do bash "$check" tasks/causal-outbox || exit 1; done` against upstream commit above; `dockerfile-pin` v1.5.0 placed in `/private/tmp` | PASS, all scripts, 2026-10-10 |

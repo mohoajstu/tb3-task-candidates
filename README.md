@@ -15,3 +15,5 @@ The task follows Terminal-Bench 3's [contribution guide](https://github.com/harb
 ## Submission status
 
 See [EVALUATION.md](EVALUATION.md) for the live check and trial record. Results are recorded as completed, not inferred from local code inspection.
+
+The current task passes all static checks, Docker oracle validation, and nop validation. Required standard and adversarial agent trials and the automated implementation-rubric review remain incomplete; the evaluation record distinguishes infrastructure errors from genuine model failures.
