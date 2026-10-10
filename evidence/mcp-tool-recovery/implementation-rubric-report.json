@@ -1,0 +1,151 @@
+{
+  "results": [
+    {
+      "checks": {
+        "verifiable": {
+          "explanation": "The verifier runs a deterministic pytest suite (tests/test_gateway.py) against the agent's gateway.py using local, in-process HTTP fixtures with fixed fault schedules. No network installs happen at verify time (pytest/pytest-json-ctrf are baked into tests/Dockerfile), and the suite is fully programmatic with no subjective or LLM-based judging.",
+          "outcome": "pass"
+        },
+        "solvable": {
+          "explanation": "solution/gateway.py was run against tests/test_gateway.py directly (via TB3_PROGRAM) in a fresh venv with pytest==9.[REDACTED].[REDACTED]/pytest-json-ctrf==0.5.2 installed, and all 4 tests passed in ~2.6s, confirming a working, efficient reference solution exists.",
+          "outcome": "pass"
+        },
+        "difficult": {
+          "explanation": "The task requires correctly composing several nontrivial reliability patterns at once: durable SQLite-backed state across restarts, dependency-graph scheduling with lexicographic tie-breaking, exactly-once idempotency semantics under a 'side-effect then 503' race, OAuth token refresh with retry-once semantics, and atomic resumable pagination. Getting all of these to compose correctly (e.g., not double-refreshing, not losing page progress, not re-creating notes) is the kind of subtle distributed-systems/API-integration work that trips up even experienced engineers, well beyond a routine undergraduate exercise.",
+          "outcome": "pass"
+        },
+        "interesting": {
+          "explanation": "Building a durable, idempotent gateway/retry layer in front of a flaky third-party JSON-RPC/OAuth API is a realistic problem for backend and platform engineers building integrations (webhook processors, job queues calling external SaaS/MCP tool APIs). This is directly analogous to real production concerns around idempotency keys, token rotation, and resumable pagination.",
+          "outcome": "pass"
+        },
+        "outcome_verified": {
+          "explanation": "Tests execute the compiled gateway.py as a subprocess and check its JSON stdout responses and the fixture service's observed side effects (note_effects, refresh_count, tool_calls, page_calls); any implementation that produces the correct behavior passes regardless of internal approach (threads vs. processes, WAL vs. journal mode, etc.).",
+          "outcome": "pass"
+        },
+        "anti_cheat_robustness": {
+          "explanation": "The ground-truth test fixture (tests/test_gateway.py) lives only in the separate verifier image and is never exposed to the agent container. The agent-facing demo_service.py intentionally uses different data, receipts, and fault triggers, and the instruction explicitly warns the agent not to rely on the demo's specifics, preventing hardcoding against the demo fixture from transferring to the verifier's independent fixture.",
+          "outcome": "pass"
+        },
+        "task_security": {
+          "explanation": "No credential exfiltration, obfuscation, destructive commands, or prompt injection were found in any Dockerfile, instruction, solution, or test file. All network/file access (local fixture service, local sqlite file, local credentials file) is scoped to the task's own purpose.",
+          "outcome": "pass"
+        },
+        "functional_verification": {
+          "explanation": "Tests invoke the actual gateway.py subprocess with real stdin/stdout JSON and verify outputs plus actual side effects recorded by the fixture HTTP server (receipts, refresh counts, call ordering) rather than scanning source code or matching strings/keywords.",
+          "outcome": "pass"
+        },
+        "deterministic_reproducible": {
+          "explanation": "Both Docker base images are pinned by sha256 digest, pip and npm dependencies are pinned to exact versions, and the test fixture is a local in-process HTTP server with fixed, scripted fault schedules (no live external services), so repeated runs should be consistent.",
+          "outcome": "pass"
+        },
+        "essential_difficulty": {
+          "explanation": "Difficulty stems from correctly reasoning about scheduling, idempotency, and fault recovery, not from output-format minutiae; the JSON response shapes are simple and compared via Python dict equality, and the instruction does not impose arbitrary precision or formatting constraints that would cause failures unrelated to core correctness.",
+          "outcome": "pass"
+        },
+        "test_instruction_alignment": {
+          "explanation": "Every behavior in instruction.md (enqueue/duplicate/conflict, dependency gating and cycles, run's lexicographic selection and max_calls/deferred semantics, get states, pagination/resume, 40[REDACTED]-refresh-retry-once, 503 idempotent replay, durability across process restarts) has a corresponding assertion in the 4 tests, and the tests introduce no requirements beyond what the instruction specifies (untested status codes like 429/500 are handled uniformly with 503 in both the reference solution and spec, so omitting them is not a new requirement).",
+          "outcome": "pass"
+        },
+        "novel": {
+          "explanation": "This is a custom-designed protocol combining JSON-RPC, OAuth refresh, idempotency-key side-effect recovery, and resumable pagination; it is not a standard textbook exercise or a well-known problem with an easily retrievable reference solution.",
+          "outcome": "pass"
+        },
+        "agentic": {
+          "explanation": "The agent must write a multi-hundred-line stateful program, iteratively exercise it against the provided demo_service.py fixture, and debug across process restarts and multi-command sequences — this requires genuine exploration and iteration, not a single zero-shot generation.",
+          "outcome": "pass"
+        },
+        "reviewable": {
+          "explanation": "A non-specialist reviewer can read instruction.md, compare it against solution/gateway.py, and verify tests/test_gateway.py's expected values (e.g. 'receipt-[REDACTED]', 'receipt-2') are derived transparently from the test's own in-file fixture counters rather than hardcoded or sourced from an opaque oracle.",
+          "outcome": "pass"
+        },
+        "instruction_concision": {
+          "explanation": "The instruction is dense but necessarily so: it specifies the exact protocol/schema (required for interoperability) rather than hinting at an implementation strategy (no mention of SQLite, specific data structures, or step-by-step procedures). It uses absolute paths and avoids roleplay/fluff.",
+          "outcome": "pass"
+        },
+        "solution_quality": {
+          "explanation": "solve.sh simply copies the pre-written solution/gateway.py (200 lines) into place; the actual computation/logic lives in that file as a real implementation (SQLite schema, HTTP calls, refresh/retry logic), not a bare echo of a final answer. The file is kept separate rather than inlined as a heredoc, consistent with guidance for files over ~20 lines.",
+          "outcome": "pass"
+        },
+        "separate_verifier_configured": {
+          "explanation": "environment_mode=\"separate\" is set, artifacts=[\"/app/gateway.py\"] is the only file the verifier needs from the agent, tests/Dockerfile bakes in pytest/pytest-json-ctrf and creates /app for the artifact, and the verifier's test fixture is self-contained (it does not depend on demo_service.py from the agent image), so there is no duplicated-asset drift to check.",
+          "outcome": "pass"
+        },
+        "environment_hygiene": {
+          "explanation": "environment/Dockerfile copies only the agent-facing starter file, demo_service.py, and demo_credentials.json — no tests/ or solution/ content, and no pytest/test-only dependencies are baked into the agent image. apt-get is preceded by update and followed by list cleanup in both Dockerfiles. tests/Dockerfile owns pytest and pytest-json-ctrf, installed at build time, not at verify time.",
+          "outcome": "pass"
+        },
+        "structured_data_schema": {
+          "explanation": "instruction.md explicitly and normatively documents every command's JSON schema (enqueue/run/get fields and types) and every HTTP/JSON-RPC request and response shape, not just illustrative examples.",
+          "outcome": "pass"
+        },
+        "typos": {
+          "explanation": "No typos were found in file paths, command names, field names, or identifiers across instruction.md, task.toml, the Dockerfiles, solution/gateway.py, or tests/test_gateway.py.",
+          "outcome": "pass"
+        },
+        "difficulty_explanation_quality": {
+          "explanation": "The '## Difficulty explanation' section in README.md is an empty, unfilled HTML-comment template with no author-written content.",
+          "outcome": "fail"
+        },
+        "solution_explanation_quality": {
+          "explanation": "The '## Solution explanation' section in README.md is an empty, unfilled HTML-comment template with no author-written content.",
+          "outcome": "fail"
+        },
+        "verification_explanation_quality": {
+          "explanation": "The '## Verification explanation' section in README.md is an empty, unfilled HTML-comment template with no author-written content.",
+          "outcome": "fail"
+        },
+        "category_and_tags": {
+          "explanation": "category=\"Software\" correctly reflects the primary skill (writing a client/gateway program), subcategory=\"Integrations\" is a reasonable fit for an API-integration task, and tags (mcp, json-rpc, oauth, idempotency, durability) are specific and descriptive of the actual skills tested.",
+          "outcome": "pass"
+        },
+        "task_name": {
+          "explanation": "The task name 'mcp-tool-recovery' (per task.toml's name field) is a concise, 3-word, kebab-case, descriptive slug that communicates the core challenge (recovering MCP tool calls) without needing to open files.",
+          "outcome": "pass"
+        },
+        "resource_configuration": {
+          "explanation": "Verifier timeout ([REDACTED]80s) comfortably covers the fast-running test suite, agent timeout (2h) is reasonable for the task's complexity, and environment resources (2 CPU, 2GB RAM, 4GB storage) are modest and appropriate — difficulty comes from reasoning about the protocol, not computational load.",
+          "outcome": "pass"
+        },
+        "task_readme": {
+          "explanation": "README.md contains only the required section headings as empty HTML-comment templates (Difficulty explanation, Solution explanation, Verification explanation, Relevant experience) with no actual author-written content in any of them.",
+          "outcome": "fail"
+        },
+        "expert_time_estimate": {
+          "explanation": "expert_time_estimate_hours=5 is non-zero and plausible for an expert implementing this multi-faceted durable-gateway protocol (dependency scheduling, idempotency, OAuth refresh, resumable pagination) from scratch.",
+          "outcome": "pass"
+        },
+        "task_toml_schema": {
+          "explanation": "task.toml uses only recognized sections and fields: schema_version, task (name/description/authors), metadata (author_name/author_email/category/subcategory/tags/expert_time_estimate_hours), verifier (timeout_sec/environment_mode), agent (timeout_sec), environment (build_timeout_sec/cpus/memory_mb/storage_mb/gpus), and the root-level artifacts list — no invented fields were found.",
+          "outcome": "pass"
+        },
+        "no_extraneous_files": {
+          "explanation": "The task directory contains stale compiled bytecode cruft not referenced by any Dockerfile, test, or solution: environment/__pycache__/demo_service.cpython-3[REDACTED]3.pyc, solution/__pycache__/outbox.cpython-3[REDACTED]3.pyc (referencing a file named 'outbox.py' that no longer exists in solution/, which now only has gateway.py), and tests/__pycache__/test_state.cpython-3[REDACTED]3*.pyc (referencing a 'test_state.py' that no longer exists — the test file is now named test_gateway.py). These are leftover artifacts from earlier, differently-named versions of the solution/test files and serve no purpose.",
+          "outcome": "fail"
+        },
+        "artifact_efficiency": {
+          "explanation": "The only artifact collected is /app/gateway.py, a single small Python script that is itself the agent's deliverable — there is no large build-time-fixed tree or dependency directory being shipped unnecessarily, and no [[verifier.collect]] hooks are used.",
+          "outcome": "pass"
+        },
+        "verifier_execution_isolation": {
+          "explanation": "test.sh chmods /logs/verifier to 700 before pytest runs. The agent's gateway.py is never imported in-process; it is always invoked via subprocess.run with a preexec_fn that calls os.setuid(65534) when running as root, demoting the executed agent code to an unprivileged user, while the root-run test.sh/pytest process alone derives the reward from the pytest exit code afterward.",
+          "outcome": "pass"
+        },
+        "ctrf_reporting": {
+          "explanation": "test.sh invokes pytest with --ctrf /logs/verifier/ctrf.json against tests/test_gateway.py, matching the standard CTRF reporting pattern for pytest-based verifiers.",
+          "outcome": "pass"
+        },
+        "do_not_modify_enforced": {
+          "explanation": "The instruction contains no 'do not modify/delete/rename a concrete artifact' constraint; its closest directives ('use only the Python standard library', 'do not print either token') are behavioral constraints rather than artifact-protection constraints, and are effectively exercised by the test environment (no third-party packages available in the verifier's Python) and by strict output equality checks (any leaked token would break the exact-match assertions), so this criterion does not apply in its intended sense.",
+          "outcome": "not_applicable"
+        },
+        "binary_reward": {
+          "explanation": "test.sh writes exactly [REDACTED] or 0 to /logs/verifier/reward.txt based on the pytest exit code ('if result -eq 0 then echo [REDACTED] else echo 0'), with no fractional or partial-credit scoring path.",
+          "outcome": "pass"
+        }
+      },
+      "cost_usd": 0.5793961999999999,
+      "task_name": "mcp-tool-recovery",
+      "error": null
+    }
+  ]
+}

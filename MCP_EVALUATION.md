@@ -12,7 +12,7 @@ Current Terminal-Bench checkout: 209679e34327a78ce8e9bf5300b2f317992863c9, fetch
 | Local reference tests | TB3_PROGRAM="$PWD/tasks/mcp-tool-recovery/solution/gateway.py" python3 -m pytest -q tasks/mcp-tool-recovery/tests/test_gateway.py | PASS, 4/4, 2026-10-10; localhost binding required an unsandboxed local run |
 | Docker oracle | harbor run -p tasks/mcp-tool-recovery --agent oracle --env docker --yes | PASS, reward 1.0, no exceptions, jobs/2026-10-10__12-46-07 |
 | Docker nop | harbor run -p tasks/mcp-tool-recovery --agent nop --env docker --yes | PASS, reward 0.0, no exceptions, jobs/2026-10-10__12-46-09 |
-| Implementation rubric | harbor check tasks/mcp-tool-recovery -r /private/tmp/tb3-current/docs/prompts/task-implementation.toml --agent claude-code --model anthropic/claude-sonnet-5 | Pending Claude authentication and author-written README sections |
+| Implementation rubric | harbor check tasks/mcp-tool-recovery -r /private/tmp/tb3-current/docs/prompts/task-implementation.toml --agent claude-code --model anthropic/claude-sonnet-5 --ae CLAUDE_FORCE_OAUTH=1 --ae CLAUDE_CODE_OAUTH_TOKEN="(private token)" | 29 pass, 5 fail, 1 not applicable, jobs/2026-10-10__13-14-50; four failures are empty human-written README sections and one was local ignored Python bytecode caches, now removed. Must rerun after author prose is added. |
 
 ## Standard agent trials
 
