@@ -25,7 +25,7 @@ harbor run -p tasks/mcp-tool-recovery --agent codex --model openai/gpt-6-astra -
 harbor run -p tasks/mcp-tool-recovery --agent claude-code --model anthropic/claude-fable-5-1 --env docker --yes --ae CLAUDE_FORCE_OAUTH=1 --ae CLAUDE_CODE_OAUTH_TOKEN="$CLAUDE_CODE_OAUTH_TOKEN" --ae CLAUDE_CODE_MAX_OUTPUT_TOKENS=128000 --ak reasoning_effort=max --n-attempts 3
 ```
 
-Results: 0/3 countable Codex failures and 0/3 countable Claude failures. The first Codex attempt on this task, jobs/2026-10-10__12-47-46, ended in NonZeroAgentExitCodeError. Its log ends with "workspace routing discovery failed" before the agent wrote a solution. The 0.0 reward is an infrastructure failure and does not count as a model failure. Its Harbor summary is saved in evidence/mcp-tool-recovery/codex-infrastructure-result.json. GitHub and Claude authentication are pending.
+Results: 0/3 countable Codex failures and 0/3 countable Claude failures. The first Codex attempt on this task, jobs/2026-10-10__12-47-46, ended in NonZeroAgentExitCodeError. A repeat using the exact current CI Codex configuration and `--n-attempts 3` (jobs/2026-10-10__13-05-05) produced three more NonZeroAgentExitCodeError exceptions. Each agent log ends with "workspace routing discovery failed" before the agent wrote a solution. Their 0.0 rewards are infrastructure failures and do not count as model failures. Harbor summaries are saved in evidence/mcp-tool-recovery/codex-infrastructure-result.json and codex-three-trials-infrastructure-result.json. The repository was published on GitHub; Claude Docker authentication and author-written README sections are pending.
 
 ## Adversarial trials
 
