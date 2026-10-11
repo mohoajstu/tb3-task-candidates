@@ -1,0 +1,74 @@
+{
+    "reportFormat": "CTRF",
+    "specVersion": "0.0.0",
+    "timestamp": "2026-[REDACTED]0-[REDACTED][REDACTED]T02:02:02.475224+00:00",
+    "generatedBy": "pytest",
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "9.[REDACTED].[REDACTED]"
+        },
+        "summary": {
+            "tests": 5,
+            "passed": 5,
+            "failed": 0,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": [REDACTED]79[REDACTED]684[REDACTED][REDACTED]844[REDACTED],
+            "stop": [REDACTED]79[REDACTED]684[REDACTED]2247[REDACTED]
+        },
+        "environment": {
+            "buildName": "Pytest JSON CTRF Report",
+            "buildNumber": "000",
+            "buildUrl": "https://ctrf.io"
+        },
+        "tests": [
+            {
+                "name": "test_reconcile.py::test_global_capacity_beats_greedy_and_price_beats_age",
+                "status": "passed",
+                "duration": 442,
+                "start": [REDACTED]79[REDACTED]684[REDACTED][REDACTED]855[REDACTED],
+                "stop": [REDACTED]79[REDACTED]684[REDACTED][REDACTED]8993,
+                "retries": 0,
+                "file_path": "test_reconcile.py"
+            },
+            {
+                "name": "test_reconcile.py::test_revisions_tombstones_conflicts_and_provenance",
+                "status": "passed",
+                "duration": 344,
+                "start": [REDACTED]79[REDACTED]684[REDACTED][REDACTED]8995,
+                "stop": [REDACTED]79[REDACTED]684[REDACTED][REDACTED]9339,
+                "retries": 0,
+                "file_path": "test_reconcile.py"
+            },
+            {
+                "name": "test_reconcile.py::test_boundaries_and_money_beyond_float_precision",
+                "status": "passed",
+                "duration": 397,
+                "start": [REDACTED]79[REDACTED]684[REDACTED][REDACTED]9340,
+                "stop": [REDACTED]79[REDACTED]684[REDACTED][REDACTED]9737,
+                "retries": 0,
+                "file_path": "test_reconcile.py"
+            },
+            {
+                "name": "test_reconcile.py::test_exhaustive_generated_histories_and_replay",
+                "status": "passed",
+                "duration": 25[REDACTED]0,
+                "start": [REDACTED]79[REDACTED]684[REDACTED][REDACTED]9739,
+                "stop": [REDACTED]79[REDACTED]684[REDACTED]22249,
+                "retries": 0,
+                "file_path": "test_reconcile.py"
+            },
+            {
+                "name": "test_reconcile.py::test_bundled_retail_export",
+                "status": "passed",
+                "duration": 2[REDACTED]9,
+                "start": [REDACTED]79[REDACTED]684[REDACTED]22250,
+                "stop": [REDACTED]79[REDACTED]684[REDACTED]22469,
+                "retries": 0,
+                "file_path": "test_reconcile.py"
+            }
+        ]
+    }
+}

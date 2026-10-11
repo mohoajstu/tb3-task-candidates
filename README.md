@@ -1,6 +1,6 @@
 # Terminal-Bench 3 submission
 
-This repository contains three task candidates. **None currently meets the required model-failure criterion.** Completed Codex trials passed all three candidates; further evaluation of commerce reconciliation is in progress. The repository is an iteration record.
+This repository contains three task candidates. **None currently meets the required model-failure criterion.** Completed Codex trials passed all three candidates. Both GPT-6.1 Sol and Opus 5.5 passed the commerce candidate on their first completed trials. The repository is an iteration record, not a qualifying submission.
 
 | Task | Agent objective | Evaluation |
 | --- | --- | --- |

@@ -24,4 +24,4 @@ The reference solver constructs an allocation using successive shortest augmenti
 
 ## Scope of evidence
 
-Oracle and nop Docker validation demonstrate that the reference passes and the incorrect starter fails. They do not establish model difficulty. The first GPT-6.1 Sol trial completed and passed; this candidate does not satisfy the hiring-email requirement for three failures from that configuration.
+Oracle and nop Docker validation demonstrate that the reference passes and the incorrect starter fails. They do not establish model difficulty. Both GPT-6.1 Sol and Opus 5.5 completed and passed their first trials; this candidate does not satisfy the hiring-email requirement for three failures from either configuration.

@@ -1,6 +1,6 @@
 # Commerce reconciliation evaluation
 
-This is a third independent candidate. Its difficulty is unproven until completed agent trials produce verifier failures. Earlier candidates are preserved.
+This third independent candidate was implemented and validated, then rejected as too easy for the hiring-email configurations: GPT-6.1 Sol and Opus 5.5 both completed and passed their first trials. Earlier candidates are preserved.
 
 ## Dataset and design
 
@@ -39,6 +39,13 @@ The instruction is an AI-assisted draft. The current rubric's `instruction_conci
 
 The hiring email names GPT-6.1 Sol xhigh and Opus 5.5 max. The upstream defaults at the recorded commit name Astra xhigh and Fable 5.1 max, with three standard trials each. This mismatch remains documented in the other evaluation records. Fable previously required usage credits on this account; that access failure is not a model failure. Neither configuration is claimed complete here.
 
+| Configuration | Trial 1 | Trial 2 | Trial 3 |
+| --- | --- | --- | --- |
+| Email: Codex / GPT-6.1 Sol / xhigh | PASS, reward 1.0, no exception | Not run; the first pass rejects this revision for the all-fail criterion | Not run |
+| Email: Claude Code / Opus 5.5 / max | PASS, reward 1.0, no exception | Not run; the first pass rejects this revision for the all-fail criterion | Not run |
+| Upstream CI: Codex / Astra / xhigh | Not run on this candidate | Pending | Pending |
+| Upstream CI: Claude Code / Fable 5.1 / max | Not run on this candidate; previous tasks encountered account access errors | Pending | Pending |
+
 Initial email-configuration trials use:
 
 ```bash
@@ -48,8 +55,26 @@ harbor run -p tasks/commerce-reconciliation --agent claude-code --model anthropi
 
 Anthropic's documented Opus model ID uses `claude-opus-5-5`; the dotted email ID failed in earlier setup attempts. Credentials are kept outside Git. Full local jobs are ignored because transcripts may contain credentials; safe result summaries will be copied to evidence.
 
-Required completed failures: three per required configuration. Count so far: zero. GPT-6.1 Sol's first trial (`jobs/2026-10-10__18-56-23`) completed normally and passed with reward 1.0 and no exceptions. This task therefore fails the hiring-email Codex all-fail requirement. Its implementation used a correct minimum-cost maximum-flow solver with integer costs, grouped by customer/SKU, and resolved conflicting and superseded revisions. Review found no obvious stated requirement missing from that implementation. The task's optimization structure was within the model's capabilities. Opus's first trial (`jobs/2026-10-10__18-56-22`) is still running. Crashes, timeouts, API errors, and container errors are excluded from model-failure counts.
+The full standard commands for the recorded upstream CI defaults are:
+
+```bash
+harbor run -p tasks/commerce-reconciliation --agent codex --model openai/gpt-6-astra --env docker --yes --ae CODEX_FORCE_AUTH_JSON=1 --ak reasoning_effort=xhigh --n-attempts 3
+harbor run -p tasks/commerce-reconciliation --agent claude-code --model anthropic/claude-fable-5-1 --env docker --yes --ae CLAUDE_FORCE_OAUTH=1 --ae CLAUDE_CODE_OAUTH_TOKEN="$CLAUDE_CODE_OAUTH_TOKEN" --ae CLAUDE_CODE_MAX_OUTPUT_TOKENS=128000 --ak reasoning_effort=max --n-attempts 3
+```
+
+Required completed failures: three per required configuration. Count: zero. GPT-6.1 Sol's first trial (`jobs/2026-10-10__18-56-23`) completed normally and passed with reward 1.0 and no exceptions. Opus 5.5's first trial (`jobs/2026-10-10__18-56-22`) also completed normally and passed with reward 1.0 and no exceptions. This candidate fails the hiring-email all-fail requirement for both configurations. No subsequent standard trials or adversarial trials were run on this rejected candidate. This is not a completed assignment evaluation.
+
+## Analysis of the unsuccessful design
+
+The intended difficulty was a shared greedy-matching blind spot. Both models instead recognized the global transportation/minimum-cost flow structure. Sol implemented minimum-cost maximum-flow with integer costs and resolved conflicting and superseded revisions. Opus implemented a transportation optimization routine and tested its result on generated and stress histories. Review found no obvious stated requirement missing from the passing Sol implementation. The data's revision and provenance rules added work but did not defeat either model. This was a solvable benchmark prototype, not evidence of a model capability gap. More cases built around the same algorithm would not justify claiming the task is beyond the frontier without fresh failures.
+
+The outcome is recorded as two model passes, not model failures. Crashes, timeouts, API errors, and container errors are excluded from model-failure counts.
 
 ## Adversarial trials
 
-Pending. The local equivalent of the current `/cheat` workflow adds `--extra-instruction-path /private/tmp/tb3-current/docs/prompts/hack-trial-prompt.md` to each agent command, once per required configuration. Zero reward is required; an access error or refusal will be documented explicitly and will not be presented as proof of verifier resistance.
+Not run on this rejected candidate. The local equivalent of the current `/cheat` workflow adds `--extra-instruction-path /private/tmp/tb3-current/docs/prompts/hack-trial-prompt.md` to each agent command, once per required configuration. Zero reward is required; an access error or refusal must be documented explicitly and cannot be presented as proof of verifier resistance. The commands below are documented for a future qualifying revision; they are not claimed as executed here.
+
+```bash
+harbor run -p tasks/commerce-reconciliation --agent codex --model openai/gpt-6-astra --env docker --yes --ae CODEX_FORCE_AUTH_JSON=1 --ak reasoning_effort=xhigh --extra-instruction-path /private/tmp/tb3-current/docs/prompts/hack-trial-prompt.md
+harbor run -p tasks/commerce-reconciliation --agent claude-code --model anthropic/claude-fable-5-1 --env docker --yes --ae CLAUDE_FORCE_OAUTH=1 --ae CLAUDE_CODE_OAUTH_TOKEN="$CLAUDE_CODE_OAUTH_TOKEN" --ae CLAUDE_CODE_MAX_OUTPUT_TOKENS=128000 --ak reasoning_effort=max --extra-instruction-path /private/tmp/tb3-current/docs/prompts/hack-trial-prompt.md
+```
