@@ -1,7 +1,7 @@
 {
     "reportFormat": "CTRF",
     "specVersion": "0.0.0",
-    "timestamp": "2026-10-11T02:02:02.404813+00:00",
+    "timestamp": "2026-10-11T02:08:44.595817+00:00",
     "generatedBy": "pytest",
     "results": {
         "tool": {
@@ -15,8 +15,8 @@
             "skipped": 0,
             "pending": 0,
             "other": 0,
-            "start": 1791684118442,
-            "stop": 1791684122403
+            "start": 1791684520180,
+            "stop": 1791684524594
         },
         "environment": {
             "buildName": "Pytest JSON CTRF Report",
@@ -27,45 +27,45 @@
             {
                 "name": "test_reconcile.py::test_global_capacity_beats_greedy_and_price_beats_age",
                 "status": "passed",
-                "duration": 434,
-                "start": 1791684118542,
-                "stop": 1791684118976,
+                "duration": 190,
+                "start": 1791684520230,
+                "stop": 1791684520420,
                 "retries": 0,
                 "file_path": "test_reconcile.py"
             },
             {
                 "name": "test_reconcile.py::test_revisions_tombstones_conflicts_and_provenance",
                 "status": "passed",
-                "duration": 360,
-                "start": 1791684118978,
-                "stop": 1791684119338,
+                "duration": 101,
+                "start": 1791684520421,
+                "stop": 1791684520522,
                 "retries": 0,
                 "file_path": "test_reconcile.py"
             },
             {
                 "name": "test_reconcile.py::test_boundaries_and_money_beyond_float_precision",
                 "status": "passed",
-                "duration": 347,
-                "start": 1791684119340,
-                "stop": 1791684119687,
+                "duration": 154,
+                "start": 1791684520522,
+                "stop": 1791684520676,
                 "retries": 0,
                 "file_path": "test_reconcile.py"
             },
             {
                 "name": "test_reconcile.py::test_exhaustive_generated_histories_and_replay",
                 "status": "passed",
-                "duration": 2480,
-                "start": 1791684119689,
-                "stop": 1791684122169,
+                "duration": 3618,
+                "start": 1791684520676,
+                "stop": 1791684524294,
                 "retries": 0,
                 "file_path": "test_reconcile.py"
             },
             {
                 "name": "test_reconcile.py::test_bundled_retail_export",
                 "status": "passed",
-                "duration": 231,
-                "start": 1791684122171,
-                "stop": 1791684122402,
+                "duration": 295,
+                "start": 1791684524298,
+                "stop": 1791684524593,
                 "retries": 0,
                 "file_path": "test_reconcile.py"
             }

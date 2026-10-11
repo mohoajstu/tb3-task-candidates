@@ -1,0 +1,151 @@
+{
+  "results": [
+    {
+      "checks": {
+        "verifiable": {
+          "explanation": "test.sh runs pytest deterministically against test_reconcile.py and writes exactly 0/[REDACTED] to reward.txt based on exit code. No network installs occur at verify time (pytest and pytest-json-ctrf are baked into tests/Dockerfile). Verification logic recomputes revision resolution and checks optimality via residual-graph max-flow/no-negative-cycle conditions plus exhaustive brute force for small cases, all programmatic and deterministic (seeded randomness).",
+          "outcome": "pass"
+        },
+        "solvable": {
+          "explanation": "solution/reconcile.py was extracted and run directly against tests/test_reconcile.py (with TB3_PROGRAM pointing at it) and all 5 tests passed in ~2.6s. The broken starter environment/reconcile.py was also run against the same tests and failed 4/5, confirming the test suite is discriminating. The reference implementation (revision resolution + Bellman-Ford style min-cost max-flow / SPFA) is implementable by an expert algorithms engineer in a few hours.",
+          "outcome": "pass"
+        },
+        "difficult": {
+          "explanation": "The task requires correctly resolving a multi-field revision/conflict/tombstone model and then solving a capacitated lexicographic (3-tier) min-cost matching problem with exact integer arithmetic and partial-quantity splitting. This goes well beyond typical undergraduate algorithms coursework (simple matching/greedy) into careful multi-objective flow-network reasoning, which would challenge an experienced professional.",
+          "outcome": "pass"
+        },
+        "interesting": {
+          "explanation": "Reconciling multi-connector commerce feeds (sales/returns across sources, deduplicating revisions, matching returns to original sales for refund/inventory purposes) is a realistic data-engineering/finance problem encountered by companies with multiple sales channels (e.g., merging Shopify/Amazon/POS exports). This is not a contrived puzzle.",
+          "outcome": "pass"
+        },
+        "outcome_verified": {
+          "explanation": "Tests check only the final JSON output's correctness (revision records, allocations, summary) via recomputation and optimality conditions (max flow + no negative residual cycle), not the implementation approach. Any algorithm reaching the same optimal integer allocation would pass; the instruction explicitly allows any tied allocation.",
+          "outcome": "pass"
+        },
+        "anti_cheat_robustness": {
+          "explanation": "The sample dataset shipped to the agent cannot be hardcoded against: the verifier re-derives expected revision records from the actual rows given to the program, runs many randomized/shuffled/replayed histories with seeded RNGs, and separately re-verifies optimality via residual-graph checks independent of any single expected allocation. The instruction explicitly warns against overfitting to the sample. Ground-truth comparisons are computed from the input, not hardcoded, and the verifier runs in a separate container after the agent container is torn down.",
+          "outcome": "pass"
+        },
+        "task_security": {
+          "explanation": "No credential access, network exfiltration, obfuscation, or destructive operations found in any Dockerfile or script. Base images are pinned by digest, apt installs are cleaned up, and agent-produced code is executed with privileges dropped to uid 65534 rather than as root.",
+          "outcome": "pass"
+        },
+        "functional_verification": {
+          "explanation": "Tests execute the actual program via subprocess with real and randomized inputs, then validate outputs by recomputing expected revision records/summaries and checking flow-optimality conditions on the resulting allocation graph — not by string/keyword matching of source code.",
+          "outcome": "pass"
+        },
+        "deterministic_reproducible": {
+          "explanation": "Both Dockerfiles pin base images by digest and dependency versions (pytest==9.[REDACTED].[REDACTED], pytest-json-ctrf==0.5.2, npm packages pinned). No live external services are used at verify time. Test randomness uses fixed seeds (e.g., random.Random(4702[REDACTED]), random.Random(82)), so repeated runs produce identical results.",
+          "outcome": "pass"
+        },
+        "essential_difficulty": {
+          "explanation": "Failures would stem from genuine algorithmic/semantic misunderstanding (wrong revision-conflict handling, greedy matching instead of globally optimal lexicographic matching, floating point creeping into money/age comparisons) rather than from formatting minutiae. The output schema, while exact, is simple and clearly specified, so it is unlikely to be the dominant source of failure.",
+          "outcome": "pass"
+        },
+        "test_instruction_alignment": {
+          "explanation": "Every clause in instruction.md (revision resolution/conflicts/tombstones/duplicates, eligibility conditions, capacity splitting, three-tier lexicographic objective, exact output schema, sorted ordering, omission of zero allocations, exact-arithmetic requirement, order-independence) has a corresponding assertion in test_reconcile.py. No test introduces requirements absent from the instruction. The suite is longer than the ~[REDACTED]00-line guideline (~248 lines), but the extra length comes from legitimate optimality-verification machinery (residual graph check, exhaustive brute force) rather than over-specification.",
+          "outcome": "pass"
+        },
+        "novel": {
+          "explanation": "While min-cost flow and revision resolution are individually known techniques, their combination into a commerce-reconciliation domain with duplicate/conflict/tombstone semantics and a 3-tier lexicographic matching objective is a custom scenario unlikely to appear verbatim in training corpora.",
+          "outcome": "pass"
+        },
+        "agentic": {
+          "explanation": "Solving this requires iteratively reading the starter code, testing against the provided sample data, debugging a non-trivial algorithm, and verifying output structure — realistically requiring multi-step file editing and execution rather than a single zero-shot generation.",
+          "outcome": "pass"
+        },
+        "reviewable": {
+          "explanation": "The task's correctness depends on specialized combinatorial-optimization reasoning (the min-cost-flow cost encoding `difference*bound+age` used to realize a lexicographic 3-tier objective, and the Bellman-Ford-style negative-cycle check used for verification). The README's Difficulty/Solution/Verification explanation sections — which are supposed to give non-specialist reviewers this context — are entirely blank template placeholders, leaving a reviewer without domain expertise unable to independently assess whether the approach is correct.",
+          "outcome": "fail"
+        },
+        "instruction_concision": {
+          "explanation": "The instruction is dense but precise, uses absolute paths (/app/reconcile.py, /app/data/retail-sample.ndjson), contains no roleplay/fluff/unneeded headings, and describes required behavior and output semantics (what to compute) rather than implementation steps (how to compute it, e.g. it never mentions flow networks or any specific algorithm).",
+          "outcome": "pass"
+        },
+        "solution_quality": {
+          "explanation": "solution/reconcile.py contains a genuine computation (revision resolution plus an SPFA-based min-cost max-flow implementation), kept as its own file rather than a heredoc, and was verified to pass all tests. solve.sh simply copies this pre-written file into place, which is appropriate for a 'write/repair this program' task since the deliverable itself is the algorithm, not a hardcoded numeric answer.",
+          "outcome": "pass"
+        },
+        "separate_verifier_configured": {
+          "explanation": "The verifier only reads the declared artifact (/app/reconcile.py) and its own baked-in data file (tests/retail-sample.ndjson, COPY'd via tests/Dockerfile); no other undeclared agent-container paths are read. All verifier tooling (pytest, pytest-json-ctrf) is pre-installed in tests/Dockerfile with no runtime pip/apt installs in test.sh. The duplicated data asset (retail-sample.ndjson) is byte-identical (same SHA-256) between environment/data/ and tests/.",
+          "outcome": "pass"
+        },
+        "environment_hygiene": {
+          "explanation": "environment/Dockerfile only copies reconcile.py and data/ into the agent image, not tests/ or solution/; it has no test-only dependencies (pytest etc. are absent). tests/Dockerfile owns all test-only deps (pinned pytest/pytest-json-ctrf) and COPYs the full tests/ directory, pre-creating /app via mkdir. Apt installs in environment/Dockerfile use unpinned package versions as required and are followed by `rm -rf /var/lib/apt/lists/*`.",
+          "outcome": "pass"
+        },
+        "structured_data_schema": {
+          "explanation": "The exact output JSON schema (records/allocations/summary objects, their exact field names, types, and semantics) is explicitly and normatively specified in instruction.md paragraphs 3-4, not left to inferred examples.",
+          "outcome": "pass"
+        },
+        "typos": {
+          "explanation": "No typos found in filenames, paths, commands, or field names; field names used in instruction.md, solution/reconcile.py, and tests/test_reconcile.py are mutually consistent (verified via automated grep comparison).",
+          "outcome": "pass"
+        },
+        "difficulty_explanation_quality": {
+          "explanation": "The '## Difficulty explanation' section in README.md contains only the unfilled template comment '<!-- Author: write [REDACTED]–3 sentences in your own words. -->' with no actual content, which per the grading guidance counts as a missing explanation.",
+          "outcome": "fail"
+        },
+        "solution_explanation_quality": {
+          "explanation": "The '## Solution explanation' section in README.md is an unfilled template placeholder with no actual content describing the strategy (revision resolution + min-cost flow), despite solve.sh/solution/reconcile.py implementing a legitimate, non-trivial approach that would benefit from a short explanation.",
+          "outcome": "fail"
+        },
+        "verification_explanation_quality": {
+          "explanation": "The '## Verification explanation' section in README.md is an unfilled template placeholder. No explanation is given for the non-obvious verification strategy (residual-graph max-flow/no-negative-cycle optimality check, exhaustive brute force for small cases), which a reviewer would otherwise need to reverse-engineer from test_reconcile.py.",
+          "outcome": "fail"
+        },
+        "category_and_tags": {
+          "explanation": "category = 'Software' and subcategory = 'Integrations' reasonably reflect a backend algorithmic task about reconciling data from multiple commerce connectors. Tags (data-reconciliation, min-cost-flow, provenance, exact-arithmetic) are specific and directly describe the skills/domain involved, not generic filler.",
+          "outcome": "pass"
+        },
+        "task_name": {
+          "explanation": "task.toml names the task 'terminal-bench/commerce-reconciliation', implying a folder slug like 'commerce-reconciliation' — two words, kebab-case, and descriptive of the core challenge (reconciling commerce data).",
+          "outcome": "pass"
+        },
+        "resource_configuration": {
+          "explanation": "cpus=2/memory_mb=2048 match the explicit resource statement in the instruction; agent timeout_sec=7200 (2h) is justified for a hard algorithmic task; verifier timeout_sec=[REDACTED]80 comfortably covers the ~3s observed local test run plus container overhead; storage_mb=4096 is appropriately modest since the task needs no large data. Values appear deliberately chosen, not left at defaults without consideration.",
+          "outcome": "pass"
+        },
+        "task_readme": {
+          "explanation": "README.md has the required section headers (Difficulty explanation, Solution explanation, Verification explanation, Relevant experience) plus a metadata summary table, but all four explanation/experience sections are unfilled template placeholders with no actual author content, which the grading guidance treats as missing.",
+          "outcome": "fail"
+        },
+        "expert_time_estimate": {
+          "explanation": "expert_time_estimate_hours = 5, non-zero and plausible given the genuine algorithmic complexity (revision resolution plus a global lexicographic min-cost matching problem), consistent with the README's stated 5-hour estimate and 2-hour agent timeout.",
+          "outcome": "pass"
+        },
+        "task_toml_schema": {
+          "explanation": "task.toml uses only recognized top-level sections (task, metadata, verifier, agent, environment, artifacts) and only recognized fields within each (e.g., metadata has author_name/author_email/author_github/category/subcategory/tags/expert_time_estimate_hours; verifier has timeout_sec/environment_mode; agent has timeout_sec; environment has build_timeout_sec/cpus/memory_mb/storage_mb/gpus). No invented fields are present.",
+          "outcome": "pass"
+        },
+        "no_extraneous_files": {
+          "explanation": "Every file present is required: Dockerfiles for both images, instruction.md, task.toml, solution files referenced by solve.sh, test files referenced by test.sh, and the data file duplicated (byte-identically) in environment/ and tests/ because both the agent image and the verifier image need their own copy. ATTRIBUTION.md documents the dataset license, a legitimate compliance artifact.",
+          "outcome": "pass"
+        },
+        "artifact_efficiency": {
+          "explanation": "The only declared artifact is the single small file /app/reconcile.py — the agent's actual deliverable — not a large tree or build-time-fixed content. No unnecessary data is transferred from the agent container to the verifier.",
+          "outcome": "pass"
+        },
+        "verifier_execution_isolation": {
+          "explanation": "test_reconcile.py never imports the agent's reconcile.py in-process; it always executes it via subprocess.run, with preexec_fn demoting to uid 65534 ('nobody') whenever the test process is root. The reward directory (/logs/verifier) is chmod 700 before pytest (and any agent code) runs, and the root-run pytest process (via test.sh) derives the reward solely from its own exit code, which the demoted subprocess cannot influence directly.",
+          "outcome": "pass"
+        },
+        "ctrf_reporting": {
+          "explanation": "test.sh invokes `python -m pytest --ctrf /logs/verifier/ctrf.json /tests/test_reconcile.py -q`, writing per-test CTRF output to the collected path, with pytest and pytest-json-ctrf pinned and pre-installed in tests/Dockerfile.",
+          "outcome": "pass"
+        },
+        "do_not_modify_enforced": {
+          "explanation": "instruction.md contains no 'do not modify/preserve/read-only' constraint on any concrete artifact; it only instructs the agent to repair /app/reconcile.py, so this criterion does not apply.",
+          "outcome": "not_applicable"
+        },
+        "binary_reward": {
+          "explanation": "test.sh writes exactly '[REDACTED]' or '0' to /logs/verifier/reward.txt based solely on the pytest exit code (`if [ \"$result\" -eq 0 ]; then echo [REDACTED] ... else echo 0 ...`), with no fractional, weighted, or clamped scoring on any code path.",
+          "outcome": "pass"
+        }
+      },
+      "cost_usd": 0.6972714,
+      "task_name": "commerce-reconciliation",
+      "error": null
+    }
+  ]
+}

@@ -29,9 +29,11 @@ Upstream basis: Terminal-Bench commit `209679e34327a78ce8e9bf5300b2f317992863c9`
 | Static scripts | Every `/private/tmp/tb3-current/scripts/checks/check-*.sh` against `tasks/commerce-reconciliation`, with dockerfile-pin v1.5.0 on PATH | PASS; `evidence/commerce-reconciliation/static-checks.txt` |
 | Local reference | `TB3_PROGRAM="$PWD/tasks/commerce-reconciliation/solution/reconcile.py" python3 -m pytest -q tasks/commerce-reconciliation/tests/test_reconcile.py` | PASS, five test groups, 2026-10-10 |
 | Local starter | Same command with `TB3_PROGRAM` pointing to `environment/reconcile.py` | Four groups fail and one passes, including a demonstrated greedy allocation failure |
-| Docker build and oracle | `harbor run -p tasks/commerce-reconciliation --agent oracle --env docker --yes` | PASS, reward 1.0, no exceptions, `jobs/2026-10-10__19-00-19` after correcting tied-allocation acceptance; initial validation also passed in `jobs/2026-10-10__18-53-50` |
-| Docker nop | Same command with `--agent nop` | PASS, reward 0.0, no exceptions, `jobs/2026-10-10__19-03-31` on the final verifier; initial validation also passed in `jobs/2026-10-10__18-54-14` |
-| Implementation rubric | Current upstream implementation rubric | Pending; author-written README sections remain empty |
+| Docker build and oracle | `harbor run -p tasks/commerce-reconciliation --agent oracle --env docker --yes` | PASS, reward 1.0, no exceptions, `jobs/2026-10-10__19-08-17` on the final verifier after correcting tied-allocation acceptance and enforcing integer audit fields |
+| Docker nop | Same command with `--agent nop` | PASS, reward 0.0, no exceptions, `jobs/2026-10-10__19-08-30` on the final verifier |
+| Implementation rubric | `harbor check tasks/commerce-reconciliation -r /private/tmp/tb3-current/docs/prompts/task-implementation.toml --agent claude-code --model anthropic/claude-sonnet-5 --ae CLAUDE_FORCE_OAUTH=1 --ae CLAUDE_CODE_OAUTH_TOKEN="$CLAUDE_CODE_OAUTH_TOKEN"` | 29 pass, 5 fail, 1 not applicable in `jobs/2026-10-10__18-58-35`. Failures: reviewable, difficulty_explanation_quality, solution_explanation_quality, verification_explanation_quality, task_readme. All concern blank README sections or absent reviewer explanations. A technical design note was subsequently added; the rubric must be rerun after the author writes the required sections. |
+
+The instruction is an AI-assisted draft. The current rubric's `instruction_concision` criterion calls for human-written instructions and flags LLM-generated prose. The author must rewrite it in their own words while retaining the exact contract, in addition to writing the four required README explanation sections. No claim of full rubric compliance is made.
 
 ## Standard trials
 

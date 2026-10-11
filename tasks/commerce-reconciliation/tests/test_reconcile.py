@@ -116,6 +116,12 @@ def assert_optimal(sales, returns, allocated, window, tolerance):
 def validate(rows, output, window, tolerance):
     audit,active=expected_records(rows)
     assert set(output)=={'records','allocations','summary'}
+    assert isinstance(output['records'],list)
+    for item in output['records']:
+        assert isinstance(item,dict)
+        assert type(item.get('rev')) is int
+        assert isinstance(item.get('lines'),list)
+        assert all(type(line) is int for line in item['lines'])
     assert output['records']==audit, 'Revision resolution or line provenance differs'
     allocated={}
     used_sales=defaultdict(int)

@@ -10,6 +10,8 @@
 - **CPUs:** 2
 - **Memory:** 2 GB
 
+Reviewer reference: [Verifier design and independent checks](../../docs/commerce-verifier-design.md). This AI-assisted technical note is separate from the required author-written explanations below.
+
 ## Difficulty explanation
 
 <!-- Author: write 1–3 sentences in your own words. -->
