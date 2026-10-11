@@ -29,15 +29,15 @@ Upstream basis: Terminal-Bench commit `209679e34327a78ce8e9bf5300b2f317992863c9`
 | Static scripts | Every `/private/tmp/tb3-current/scripts/checks/check-*.sh` against `tasks/commerce-reconciliation`, with dockerfile-pin v1.5.0 on PATH | PASS; `evidence/commerce-reconciliation/static-checks.txt` |
 | Local reference | `TB3_PROGRAM="$PWD/tasks/commerce-reconciliation/solution/reconcile.py" python3 -m pytest -q tasks/commerce-reconciliation/tests/test_reconcile.py` | PASS, five test groups, 2026-10-10 |
 | Local starter | Same command with `TB3_PROGRAM` pointing to `environment/reconcile.py` | Four groups fail and one passes, including a demonstrated greedy allocation failure |
-| Docker build and oracle | `harbor run -p tasks/commerce-reconciliation --agent oracle --env docker --yes` | PASS, reward 1.0, no exceptions, `jobs/2026-10-10__18-53-50` |
-| Docker nop | Same command with `--agent nop` | PASS, reward 0.0, no exceptions, `jobs/2026-10-10__18-54-14` |
+| Docker build and oracle | `harbor run -p tasks/commerce-reconciliation --agent oracle --env docker --yes` | PASS, reward 1.0, no exceptions, `jobs/2026-10-10__19-00-19` after correcting tied-allocation acceptance; initial validation also passed in `jobs/2026-10-10__18-53-50` |
+| Docker nop | Same command with `--agent nop` | PASS, reward 0.0, no exceptions, `jobs/2026-10-10__19-03-31` on the final verifier; initial validation also passed in `jobs/2026-10-10__18-54-14` |
 | Implementation rubric | Current upstream implementation rubric | Pending; author-written README sections remain empty |
 
 ## Standard trials
 
 The hiring email names GPT-6.1 Sol xhigh and Opus 5.5 max. The upstream defaults at the recorded commit name Astra xhigh and Fable 5.1 max, with three standard trials each. This mismatch remains documented in the other evaluation records. Fable previously required usage credits on this account; that access failure is not a model failure. Neither configuration is claimed complete here.
 
-Initial email-configuration trials are running with:
+Initial email-configuration trials use:
 
 ```bash
 harbor run -p tasks/commerce-reconciliation --agent codex --model openai/gpt-6.1-sol --env docker --yes --ae CODEX_FORCE_AUTH_JSON=1 --ak reasoning_effort=xhigh
@@ -46,7 +46,7 @@ harbor run -p tasks/commerce-reconciliation --agent claude-code --model anthropi
 
 Anthropic's documented Opus model ID uses `claude-opus-5-5`; the dotted email ID failed in earlier setup attempts. Credentials are kept outside Git. Full local jobs are ignored because transcripts may contain credentials; safe result summaries will be copied to evidence.
 
-Required completed failures: three per required configuration. Count so far: zero. Trial outcome and failure analysis are pending. Crashes, timeouts, API errors, and container errors will be excluded.
+Required completed failures: three per required configuration. Count so far: zero. GPT-6.1 Sol's first trial (`jobs/2026-10-10__18-56-23`) completed normally and passed with reward 1.0 and no exceptions. This task therefore fails the hiring-email Codex all-fail requirement. Its implementation used a correct minimum-cost maximum-flow solver with integer costs, grouped by customer/SKU, and resolved conflicting and superseded revisions. Review found no obvious stated requirement missing from that implementation. The task's optimization structure was within the model's capabilities. Opus's first trial (`jobs/2026-10-10__18-56-22`) is still running. Crashes, timeouts, API errors, and container errors are excluded from model-failure counts.
 
 ## Adversarial trials
 

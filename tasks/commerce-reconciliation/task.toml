@@ -15,7 +15,7 @@ author_github = "mohoajstu"
 category = "Software"
 subcategory = "Integrations"
 tags = ["data-reconciliation", "min-cost-flow", "provenance", "exact-arithmetic"]
-expert_time_estimate_hours = 5
+expert_time_estimate_hours = 2
 
 [verifier]
 timeout_sec = 180.0

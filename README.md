@@ -1,6 +1,6 @@
 # Terminal-Bench 3 submission
 
-This repository contains three task candidates. **A qualifying submission has not yet been demonstrated.** Completed Codex trials passed the first two candidates; the new commerce reconciliation candidate is undergoing fresh agent evaluation. The repository is an iteration record.
+This repository contains three task candidates. **None currently meets the required model-failure criterion.** Completed Codex trials passed all three candidates; further evaluation of commerce reconciliation is in progress. The repository is an iteration record.
 
 | Task | Agent objective | Evaluation |
 | --- | --- | --- |

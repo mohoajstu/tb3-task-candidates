@@ -5,7 +5,7 @@
 - **Author:** Mohammed Abdul Jabbar (mohoabja@gmail.com)
 - **Category:** `Software`
 - **Tags:** <code>data-reconciliation</code> <code>min-cost-flow</code> <code>provenance</code> <code>exact-arithmetic</code>
-- **Expert time:** 5 hours
+- **Expert time:** 2 hours
 - **Agent timeout:** 2 hours
 - **CPUs:** 2
 - **Memory:** 2 GB
