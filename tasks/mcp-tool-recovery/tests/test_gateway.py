@@ -88,7 +88,7 @@ class Handler(BaseHTTPRequestHandler):
                 state.notes[call_id] = {"receipt": "receipt-" + str(state.note_effects)}
             if state.pause_note == call_id:
                 state.note_entered.set()
-                state.note_release.wait(timeout=5)
+                state.note_release.wait(timeout=10)
             if call_id in state.lose_note and call_id not in state.failed_notes:
                 state.failed_notes.add(call_id)
                 return self.respond(503, {"error": "reply lost after commit"})
@@ -309,3 +309,48 @@ def test_killed_run_retries_ambiguous_note_without_duplicate_effect():
         ]
         assert state.note_effects == 1
         assert state.tool_calls == [("crash", "notes.create"), ("crash", "notes.create")]
+
+
+def test_independent_call_completes_while_another_is_blocked():
+    """A slow call must not hold a database-wide lock across its network wait."""
+    db, credentials = workspace()
+    state = ServiceState()
+    state.pause_note = "a"
+    with service(state) as base:
+        assert call(db, credentials, base, [enqueue("a"), enqueue("b")]) == [
+            {"status": "accepted"}, {"status": "accepted"}]
+        demote = (lambda: os.setuid(65534)) if os.geteuid() == 0 else None
+        first = subprocess.Popen(
+            [sys.executable, PROGRAM, "--db", str(db), "--base-url", base,
+             "--credentials", str(credentials)],
+            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            text=True, preexec_fn=demote, cwd=str(Path(PROGRAM).parent),
+            env={"PATH": "/usr/local/bin:/usr/bin:/bin"},
+        )
+        second = None
+        try:
+            first.stdin.write(json.dumps(run(1)) + "\n")
+            first.stdin.close()
+            assert state.note_entered.wait(timeout=3)
+            second = subprocess.Popen(
+                [sys.executable, PROGRAM, "--db", str(db), "--base-url", base,
+                 "--credentials", str(credentials)],
+                stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                text=True, preexec_fn=demote, cwd=str(Path(PROGRAM).parent),
+                env={"PATH": "/usr/local/bin:/usr/bin:/bin"},
+            )
+            output, error = second.communicate(json.dumps(run(1)) + "\n", timeout=3)
+            assert second.returncode == 0, error[-1000:]
+            assert json.loads(output) == {
+                "status": "ok", "completed": [{"id": "b", "result": {"receipt": "receipt-2"}}],
+                "deferred": None}
+        finally:
+            state.note_release.set()
+            if second is not None and second.poll() is None:
+                second.kill()
+                second.wait(timeout=5)
+        assert first.wait(timeout=10) == 0, first.stderr.read()[-1000:]
+        assert json.loads(first.stdout.read()) == {
+            "status": "ok", "completed": [{"id": "a", "result": {"receipt": "receipt-1"}}],
+            "deferred": None}
+        assert state.tool_calls == [("a", "notes.create"), ("b", "notes.create")]
