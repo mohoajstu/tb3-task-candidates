@@ -8,6 +8,7 @@ import subprocess
 import sys
 import tempfile
 import threading
+import time
 from contextlib import contextmanager
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -30,6 +31,9 @@ class ServiceState:
         self.refresh_count = 0
         self.tool_calls = []
         self.page_calls = []
+        self.pause_note = None
+        self.note_entered = threading.Event()
+        self.note_release = threading.Event()
         self.collections = {
             "alpha": [{"key": "T-9", "value": None}, {"key": "T-2", "value": [1, True]},
                       {"key": "T-11", "value": {"owner": "west"}}],
@@ -79,6 +83,9 @@ class Handler(BaseHTTPRequestHandler):
         name, args = data["params"]["name"], data["params"]["arguments"]
         state.tool_calls.append((call_id, name))
         if name == "notes.create":
+            if state.pause_note == call_id:
+                state.note_entered.set()
+                state.note_release.wait(timeout=5)
             if call_id not in state.notes:
                 state.note_effects += 1
                 state.notes[call_id] = {"receipt": "receipt-" + str(state.note_effects)}
@@ -232,3 +239,40 @@ def test_cycle_and_lexicographic_release():
             {"status": "ok", "completed": [], "deferred": None},
             {"status": "queued"}, {"status": "queued"}]
         assert state.tool_calls == [("a", "notes.create"), ("b", "notes.create")]
+
+
+def test_overlapping_runs_claim_each_call_once():
+    """Two processes sharing a DB must not both execute or report one call."""
+    db, credentials = workspace()
+    state = ServiceState()
+    state.pause_note = "slow"
+    with service(state) as base:
+        assert call(db, credentials, base, [enqueue("slow")]) == [{"status": "accepted"}]
+
+        def start_run():
+            demote = (lambda: os.setuid(65534)) if os.geteuid() == 0 else None
+            proc = subprocess.Popen(
+                [sys.executable, PROGRAM, "--db", str(db), "--base-url", base,
+                 "--credentials", str(credentials)],
+                stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                text=True, preexec_fn=demote, cwd=str(Path(PROGRAM).parent),
+                env={"PATH": "/usr/local/bin:/usr/bin:/bin"},
+            )
+            proc.stdin.write(json.dumps(run(1)) + "\n")
+            proc.stdin.close()
+            return proc
+
+        first = start_run()
+        assert state.note_entered.wait(timeout=3)
+        second = start_run()
+        try:
+            time.sleep(0.5)
+        finally:
+            state.note_release.set()
+        responses = []
+        for proc in (first, second):
+            assert proc.wait(timeout=10) == 0, proc.stderr.read()[-1000:]
+            responses.append(json.loads(proc.stdout.read()))
+        assert sorted(len(response["completed"]) for response in responses) == [0, 1]
+        assert state.tool_calls == [("slow", "notes.create")]
+        assert state.note_effects == 1

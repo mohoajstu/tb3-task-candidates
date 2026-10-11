@@ -3,6 +3,7 @@
 """Reference MCP-style tool-call recovery gateway."""
 
 import argparse
+import fcntl
 import json
 import sqlite3
 import sys
@@ -189,11 +190,18 @@ def main():
     args = parser.parse_args()
     db = sqlite3.connect(args.db, timeout=30, isolation_level=None)
     db.execute("PRAGMA busy_timeout=30000")
-    initialize(db, args.credentials)
-    for line in sys.stdin:
-        command = json.loads(line)
-        result = process(db, args.base_url.rstrip("/"), command)
-        print(encode(result), flush=True)
+    with open(args.db + ".lock", "a+", encoding="utf-8") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        initialize(db, args.credentials)
+        fcntl.flock(lock, fcntl.LOCK_UN)
+        for line in sys.stdin:
+            command = json.loads(line)
+            fcntl.flock(lock, fcntl.LOCK_EX)
+            try:
+                result = process(db, args.base_url.rstrip("/"), command)
+            finally:
+                fcntl.flock(lock, fcntl.LOCK_UN)
+            print(encode(result), flush=True)
 
 
 if __name__ == "__main__":

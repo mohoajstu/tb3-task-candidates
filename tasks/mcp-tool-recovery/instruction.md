@@ -23,4 +23,6 @@ The service may perform a "notes.create" side effect and then return HTTP 503. R
 
 All valid commands use exactly the fields described above. Calls may be enqueued, run, and queried in any order and across fresh processes. The verifier exercises interleaved dependencies, duplicate and conflicting submissions, token rotation, ambiguous side effects, multi-page recovery, and restarts.
 
+Several gateway processes may use the same database at once. While a process is running a queued call, another process must not execute that call or report it in its own completed list. Overlapping runs may wait for one another; after a process exits or is killed, its unfinished call remains retryable under the original idempotency key. This applies to each page request and credential refresh as well as to whole calls.
+
 You have 7200 seconds to complete this task. Do not cheat by using online solutions or hints specific to this task.
