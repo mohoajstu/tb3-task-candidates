@@ -1,0 +1,83 @@
+{
+    "reportFormat": "CTRF",
+    "specVersion": "0.0.0",
+    "timestamp": "2026-10-11T00:52:35.758498+00:00",
+    "generatedBy": "pytest",
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "9.1.1"
+        },
+        "summary": {
+            "tests": 6,
+            "passed": 6,
+            "failed": 0,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1791679949972,
+            "stop": 1791679955757
+        },
+        "environment": {
+            "buildName": "Pytest JSON CTRF Report",
+            "buildNumber": "000",
+            "buildUrl": "https://ctrf.io"
+        },
+        "tests": [
+            {
+                "name": "test_gateway.py::test_dependencies_order_and_retransmissions",
+                "status": "passed",
+                "duration": 943,
+                "start": 1791679950057,
+                "stop": 1791679951000,
+                "retries": 0,
+                "file_path": "test_gateway.py"
+            },
+            {
+                "name": "test_gateway.py::test_ambiguous_side_effect_and_rotating_credentials",
+                "status": "passed",
+                "duration": 947,
+                "start": 1791679951002,
+                "stop": 1791679951949,
+                "retries": 0,
+                "file_path": "test_gateway.py"
+            },
+            {
+                "name": "test_gateway.py::test_pagination_resume_after_failure",
+                "status": "passed",
+                "duration": 814,
+                "start": 1791679951949,
+                "stop": 1791679952763,
+                "retries": 0,
+                "file_path": "test_gateway.py"
+            },
+            {
+                "name": "test_gateway.py::test_cycle_and_lexicographic_release",
+                "status": "passed",
+                "duration": 658,
+                "start": 1791679952764,
+                "stop": 1791679953422,
+                "retries": 0,
+                "file_path": "test_gateway.py"
+            },
+            {
+                "name": "test_gateway.py::test_overlapping_runs_claim_each_call_once",
+                "status": "passed",
+                "duration": 1417,
+                "start": 1791679953422,
+                "stop": 1791679954839,
+                "retries": 0,
+                "file_path": "test_gateway.py"
+            },
+            {
+                "name": "test_gateway.py::test_killed_run_retries_ambiguous_note_without_duplicate_effect",
+                "status": "passed",
+                "duration": 916,
+                "start": 1791679954840,
+                "stop": 1791679955756,
+                "retries": 0,
+                "file_path": "test_gateway.py"
+            }
+        ]
+    }
+}

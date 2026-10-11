@@ -83,12 +83,12 @@ class Handler(BaseHTTPRequestHandler):
         name, args = data["params"]["name"], data["params"]["arguments"]
         state.tool_calls.append((call_id, name))
         if name == "notes.create":
-            if state.pause_note == call_id:
-                state.note_entered.set()
-                state.note_release.wait(timeout=5)
             if call_id not in state.notes:
                 state.note_effects += 1
                 state.notes[call_id] = {"receipt": "receipt-" + str(state.note_effects)}
+            if state.pause_note == call_id:
+                state.note_entered.set()
+                state.note_release.wait(timeout=5)
             if call_id in state.lose_note and call_id not in state.failed_notes:
                 state.failed_notes.add(call_id)
                 return self.respond(503, {"error": "reply lost after commit"})
@@ -276,3 +276,36 @@ def test_overlapping_runs_claim_each_call_once():
         assert sorted(len(response["completed"]) for response in responses) == [0, 1]
         assert state.tool_calls == [("slow", "notes.create")]
         assert state.note_effects == 1
+
+
+def test_killed_run_retries_ambiguous_note_without_duplicate_effect():
+    """A killed process cannot strand a call or change its idempotency key."""
+    db, credentials = workspace()
+    state = ServiceState()
+    state.pause_note = "crash"
+    with service(state) as base:
+        assert call(db, credentials, base, [enqueue("crash")]) == [{"status": "accepted"}]
+        demote = (lambda: os.setuid(65534)) if os.geteuid() == 0 else None
+        proc = subprocess.Popen(
+            [sys.executable, PROGRAM, "--db", str(db), "--base-url", base,
+             "--credentials", str(credentials)],
+            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            text=True, preexec_fn=demote, cwd=str(Path(PROGRAM).parent),
+            env={"PATH": "/usr/local/bin:/usr/bin:/bin"},
+        )
+        try:
+            proc.stdin.write(json.dumps(run(1)) + "\n")
+            proc.stdin.close()
+            assert state.note_entered.wait(timeout=3)
+            proc.kill()
+            assert proc.wait(timeout=5) != 0
+        finally:
+            state.note_release.set()
+        assert call(db, credentials, base, [get("crash"), run(1), get("crash")]) == [
+            {"status": "queued"},
+            {"status": "ok", "completed": [{"id": "crash", "result": {"receipt": "receipt-1"}}],
+             "deferred": None},
+            {"status": "done", "result": {"receipt": "receipt-1"}},
+        ]
+        assert state.note_effects == 1
+        assert state.tool_calls == [("crash", "notes.create"), ("crash", "notes.create")]

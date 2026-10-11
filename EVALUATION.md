@@ -66,6 +66,10 @@ harbor run -p tasks/causal-outbox --agent codex --model openai/gpt-6-astra --env
 harbor run -p tasks/causal-outbox --agent claude-code --model anthropic/claude-fable-5-1 --env docker --yes --ae CLAUDE_FORCE_OAUTH=1 --ae CLAUDE_CODE_OAUTH_TOKEN="$CLAUDE_CODE_OAUTH_TOKEN" --ae CLAUDE_CODE_MAX_OUTPUT_TOKENS=128000 --ak reasoning_effort=max --extra-instruction-path /private/tmp/tb3-current/docs/prompts/hack-trial-prompt.md
 ```
 
+## Supplemental email-model trial
+
+An isolated copy of Causal Outbox was tested with a Docker image that adds CA certificates and Codex CLI 0.162.1 so GPT-6.1 Sol can connect. The single `openai/gpt-6.1-sol` xhigh trial in `jobs/2026-10-10__17-41-04` completed normally and passed the verifier (reward 1.0, no exceptions). This task revision is therefore also too easy for that hiring-email configuration. The isolated image differs from the checked-in Causal Outbox image, and the result is not one of the upstream CI trials. The Harbor result summary is saved in `evidence/causal-outbox/codex-6-1-sol-pass.json`.
+
 ## Failure analysis
 
-No completed model trajectory exists yet, so there is no honest model failure analysis. The recorded Codex failures are execution/network failures, not verifier failures caused by model code. The task design aims to expose mistakes in causal ordering, durable pending events, replay, and acknowledgement validation; that hypothesis still requires the mandated trials to test it.
+The supplemental GPT-6.1 Sol trajectory completed and passed, so it provides no model failure to analyze. Earlier recorded Codex failures were execution/network failures, not verifier failures caused by model code. The task design aimed to expose mistakes in causal ordering, durable pending events, replay, and acknowledgement validation; the completed supplemental trial shows this verifier did not catch a mistake from GPT-6.1 Sol. The mandated upstream CI trials remain incomplete.
