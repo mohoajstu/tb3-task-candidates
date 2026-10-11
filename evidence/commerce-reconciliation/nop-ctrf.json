@@ -1,0 +1,86 @@
+{
+    "reportFormat": "CTRF",
+    "specVersion": "0.0.0",
+    "timestamp": "2026-10-11T01:56:02.611576+00:00",
+    "generatedBy": "pytest",
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "9.1.1"
+        },
+        "summary": {
+            "tests": 5,
+            "passed": 1,
+            "failed": 4,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1791683760524,
+            "stop": 1791683762603
+        },
+        "environment": {
+            "buildName": "Pytest JSON CTRF Report",
+            "buildNumber": "000",
+            "buildUrl": "https://ctrf.io"
+        },
+        "tests": [
+            {
+                "name": "test_reconcile.py::test_global_capacity_beats_greedy_and_price_beats_age",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 143,
+                "start": 1791683760577,
+                "stop": 1791683760720,
+                "retries": 0,
+                "file_path": "test_reconcile.py",
+                "trace": "def test_global_capacity_beats_greedy_and_price_beats_age():\n        cases=[\n            [row('s0',price=100),row('s1',price=110),row('r0','return',timestamp=1,price=105),row('r1','return',timestamp=2,price=100)],\n            [row('s0',timestamp=0,price=100),row('s1',timestamp=9,price=101),row('r0','return',timestamp=10,price=100)],\n            [row('s0',quantity=3),row('s1',timestamp=2,quantity=2),row('r0','return',timestamp=3,quantity=4),row('r1','return',timestamp=22,quantity=2)],\n        ]\n        for rows in cases:\n>           output=run(rows,20,5)\n                   ^^^^^^^^^^^^^^\n\n/tests/test_reconcile.py:194: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n/tests/test_reconcile.py:40: in run\n    validate(rows, output, window, tolerance)\n/tests/test_reconcile.py:163: in validate\n    assert_optimal(group_sales,group_returns,allocated,window,tolerance)\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nsales = [(('shop', 's0'), {'source': 'shop', 'id': 's0', 'rev': 1, 'kind': 'sale', ...}), (('shop', 's1'), {'source': 'shop', 'id': 's1', 'rev': 1, 'kind': 'sale', ...})]\nreturns = [(('shop', 'r0'), {'source': 'shop', 'id': 'r0', 'rev': 1, 'kind': 'return', ...}), (('shop', 'r1'), {'source': 'shop', 'id': 'r1', 'rev': 1, 'kind': 'return', ...})]\nallocated = {(('shop', 's0'), ('shop', 'r0')): 1}, window = 20, tolerance = 5\n\n    def assert_optimal(sales, returns, allocated, window, tolerance):\n        \"\"\"A max flow has no augmenting path; a min-cost flow has no negative cycle.\"\"\"\n        n = len(sales)+len(returns)+2\n        source,sink = n-2,n-1\n        edges=[]\n        used_sales=defaultdict(int)\n        used_returns=defaultdict(int)\n        for (sale,ret),quantity in allocated.items():\n            used_sales[sale]+=quantity\n            used_returns[ret]+=quantity\n        bound=sum(item['quantity'] for _,item in returns)*window+1\n    \n        def residual(a,b,capacity,flow,cost):\n            if capacity>flow:edges.append((a,b,cost))\n            if flow:edges.append((b,a,-cost))\n    \n        for i,(key,item) in enumerate(sales):\n            residual(source,i,item['quantity'],used_sales[key],0)\n        for j,(key,item) in enumerate(returns):\n            residual(len(sales)+j,sink,item['quantity'],used_returns[key],0)\n        for i,(skey,sale) in enumerate(sales):\n            for j,(rkey,ret) in enumerate(returns):\n                if eligible(sale,ret,window,tolerance):\n                    cost=abs(ret['price_minor']-sale['price_minor'])*bound+ret['timestamp']-sale['timestamp']\n                    residual(i,len(sales)+j,min(sale['quantity'],ret['quantity']),\n                             allocated.get((skey,rkey),0),cost)\n        reached={source}\n        while True:\n            extended=reached|{b for a,b,_ in edges if a in reached}\n            if extended==reached:break\n            reached=extended\n>       assert sink not in reached, 'Allocation is not maximum quantity'\nE       AssertionError: Allocation is not maximum quantity\nE       assert 5 not in {0, 1, 2, 3, 4, 5}\n\n/tests/test_reconcile.py:104: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_reconcile.py::test_revisions_tombstones_conflicts_and_provenance",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 91,
+                "start": 1791683760721,
+                "stop": 1791683760812,
+                "retries": 0,
+                "file_path": "test_reconcile.py",
+                "trace": "def test_revisions_tombstones_conflicts_and_provenance():\n        original=row('same',quantity=4)\n        rows=[original,dict(reversed(list(original.items()))),row('same',rev=3,quantity=2),\n              row('same',rev=2,quantity=99),row('same',source='other',quantity=1),\n              row('return','return',timestamp=5,quantity=3),row('gone',quantity=7),\n              dict(source='shop',id='gone',rev=2,kind='delete'),row('conflict'),\n              row('conflict',rev=4,quantity=2),row('conflict',rev=4,quantity=3),\n              row('unknown',customer=None),row('same',rev=3,quantity=2),\n              row('flip',rev=1),row('flip','return',rev=2,timestamp=8)]\n>       run(rows)\n\n/tests/test_reconcile.py:208: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n/tests/test_reconcile.py:40: in run\n    validate(rows, output, window, tolerance)\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nrows = [{'source': 'shop', 'id': 'same', 'rev': 1, 'kind': 'sale', ...}, {'invoice': 'invoice-same', 'price_minor': 100, 'qua...'id': 'same', 'rev': 1, 'kind': 'sale', ...}, {'source': 'shop', 'id': 'return', 'rev': 1, 'kind': 'return', ...}, ...]\noutput = {'records': [{'source': 'other', 'id': 'same', 'rev': 1, 'state': 'active', ...}, {'source': 'shop', 'id': 'conflict',...2}], 'summary': {'sale_quantity': 6, 'return_quantity': 4, 'matched_quantity': 4, 'unmatched_return_quantity': 0, ...}}\nwindow = 20, tolerance = 10\n\n    def validate(rows, output, window, tolerance):\n        audit,active=expected_records(rows)\n        assert set(output)=={'records','allocations','summary'}\n>       assert output['records']==audit, 'Revision resolution or line provenance differs'\nE       AssertionError: Revision resolution or line provenance differs\nE       assert [{'source': '...e', ...}, ...] == [{'source': '...e', ...}, ...]\nE         \nE         At index 1 diff: {'source': 'shop', 'id': 'conflict', 'rev': 4, 'state': 'active', 'lines': [11]} != {'source': 'shop', 'id': 'conflict', 'rev': 4, 'state': 'conflict', 'lines': [10, 11]}\nE         Use -v to get more diff\n\n/tests/test_reconcile.py:119: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_reconcile.py::test_boundaries_and_money_beyond_float_precision",
+                "status": "passed",
+                "duration": 229,
+                "start": 1791683760812,
+                "stop": 1791683761041,
+                "retries": 0,
+                "file_path": "test_reconcile.py"
+            },
+            {
+                "name": "test_reconcile.py::test_exhaustive_generated_histories_and_replay",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 220,
+                "start": 1791683761042,
+                "stop": 1791683761262,
+                "retries": 0,
+                "file_path": "test_reconcile.py",
+                "trace": "def test_exhaustive_generated_histories_and_replay():\n        rng=random.Random(47021)\n        for trial in range(24):\n            rows=[row('s'+str(i),timestamp=rng.randrange(8),price=rng.randrange(98,105),quantity=rng.randrange(1,3)) for i in range(3)]\n            rows += [row('r'+str(i),'return',timestamp=rng.randrange(4,13),price=rng.randrange(98,105),quantity=rng.randrange(1,3)) for i in range(3)]\n            window,tolerance=rng.randrange(3,10),rng.randrange(4)\n            rng.shuffle(rows)\n            output=run(rows,window,tolerance)\n            summary=output['summary']\n            assert (summary['matched_quantity'],-summary['price_distance'],-summary['age_seconds'])==exhaustive(rows,window,tolerance)\n            if trial%6==0:\n                replay=rows+list(reversed(rows))\n>               replay_output=run(replay,window,tolerance)\n                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n/tests/test_reconcile.py:238: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n/tests/test_reconcile.py:40: in run\n    validate(rows, output, window, tolerance)\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nrows = [{'source': 'shop', 'id': 's1', 'rev': 1, 'kind': 'sale', ...}, {'source': 'shop', 'id': 'r0', 'rev': 1, 'kind': 'retu...hop', 'id': 'r1', 'rev': 1, 'kind': 'return', ...}, {'source': 'shop', 'id': 's0', 'rev': 1, 'kind': 'sale', ...}, ...]\noutput = {'records': [{'source': 'shop', 'id': 'r0', 'rev': 1, 'state': 'active', ...}, {'source': 'shop', 'id': 'r1', 'rev': 1...1}], 'summary': {'sale_quantity': 3, 'return_quantity': 3, 'matched_quantity': 2, 'unmatched_return_quantity': 1, ...}}\nwindow = 3, tolerance = 3\n\n    def validate(rows, output, window, tolerance):\n        audit,active=expected_records(rows)\n        assert set(output)=={'records','allocations','summary'}\n>       assert output['records']==audit, 'Revision resolution or line provenance differs'\nE       AssertionError: Revision resolution or line provenance differs\nE       assert [{'source': '...active', ...}] == [{'source': '...active', ...}]\nE         \nE         At index 0 diff: {'source': 'shop', 'id': 'r0', 'rev': 1, 'state': 'active', 'lines': [11]} != {'source': 'shop', 'id': 'r0', 'rev': 1, 'state': 'active', 'lines': [2, 11]}\nE         Use -v to get more diff\n\n/tests/test_reconcile.py:119: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_reconcile.py::test_bundled_retail_export",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 1333,
+                "start": 1791683761264,
+                "stop": 1791683762597,
+                "retries": 0,
+                "file_path": "test_reconcile.py",
+                "trace": "def test_bundled_retail_export():\n        rows=[json.loads(line) for line in DATA.read_text().splitlines()]\n>       first=run(rows,90*86400,100)\n              ^^^^^^^^^^^^^^^^^^^^^^\n\n/tests/test_reconcile.py:244: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n/tests/test_reconcile.py:40: in run\n    validate(rows, output, window, tolerance)\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nrows = [{'source': 'retail', 'id': 'row-2', 'rev': 1, 'kind': 'sale', ...}, {'source': 'retail', 'id': 'row-2', 'rev': 1, 'ki...'id': 'row-2', 'rev': 4, 'kind': 'sale', ...}, {'source': 'retail', 'id': 'row-2', 'rev': 4, 'kind': 'sale', ...}, ...]\noutput = {'records': [{'source': 'retail', 'id': 'row-10', 'rev': 1, 'state': 'active', ...}, {'source': 'retail', 'id': 'row-1...mmary': {'sale_quantity': 13529, 'return_quantity': 142, 'matched_quantity': 6, 'unmatched_return_quantity': 136, ...}}\nwindow = 7776000, tolerance = 100\n\n    def validate(rows, output, window, tolerance):\n        audit,active=expected_records(rows)\n        assert set(output)=={'records','allocations','summary'}\n>       assert output['records']==audit, 'Revision resolution or line provenance differs'\nE       AssertionError: Revision resolution or line provenance differs\nE       assert [{'source': '...e', ...}, ...] == [{'source': '...e', ...}, ...]\nE         \nE         At index 29 diff: {'source': 'retail', 'id': 'row-1025', 'rev': 1, 'state': 'active', 'lines': [1117]} != {'source': 'retail', 'id': 'row-1025', 'rev': 1, 'state': 'active', 'lines': [1116, 1117]}\nE         Use -v to get more diff\n\n/tests/test_reconcile.py:119: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            }
+        ]
+    }
+}
